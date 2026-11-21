@@ -57,7 +57,7 @@ const DNC_KEY='three_site_sponsor_suppression_v1';
 function suppression(){try{return JSON.parse(localStorage.getItem(DNC_KEY)||'[]')}catch(e){return []}}
 function suppressed(l){const email=norm(l.email);return l.status==='do_not_contact'||!!email&&suppression().includes(email)||!!email&&db.leads.some(x=>norm(x.email)===email&&x.status==='do_not_contact')}
 function suppressEmail(email){const key=norm(email);if(!key)return;const list=suppression();if(!list.includes(key)){list.push(key);try{localStorage.setItem(DNC_KEY,JSON.stringify(list))}catch(e){alert('Could not save the Do Not Contact list. Stop outreach and back up your data.')}}db.leads.forEach(x=>{if(norm(x.email)===key){x.status='do_not_contact';x.followDate=''}});save()}
-function legalSubject(s){return 'ADV: '+String(s||'').replace(/^(ADV:\\s*)+/i,'').trim()}
+function legalSubject(s){return 'ADV: '+String(s||'').replace(/^(ADV:\s*)+/i,'').trim()}
 function safeDraft(l){return !suppressed(l)&&!!mailingAddress().trim()}
 
 function mailingAddress(){try{return localStorage.getItem(ADDRESS_KEY)||''}catch(e){return ''}}
@@ -163,7 +163,7 @@ $('zSkip').onclick=()=>{const q=ready();const index=q.findIndex(x=>x.id===active
 $('zQueue').onclick=()=>{const q=ready().slice(0,10);$('filter').value='all';$('search').value='';render();$('count').textContent='NEXT 10 READY: '+q.length+' available — use Prepare next business to start';prepare(q[0])};
 $('zFollow').onclick=()=>{const q=due();if(!q.length)return notify('No follow-ups are due on this website.');prepare(q[0])};
 $('zBackup').onclick=()=>$('backup').click();
-$('dncAdd').onclick=()=>{const email=$('dncEmail').value.trim();if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){alert('Enter a valid email address.');return}if(!confirm('Block this email from all three websites?'))return;suppressEmail(email);$('dncEmail').value='';render();notify('Email blocked across all three sites. Also remove it from Zoho or any other mailing lists.')};
+$('dncAdd').onclick=()=>{const email=$('dncEmail').value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Enter a valid email address.');return}if(!confirm('Block this email from all three websites?'))return;suppressEmail(email);$('dncEmail').value='';render();notify('Email blocked across all three sites. Also remove it from Zoho or any other mailing lists.')};
 $('dncExport').onclick=()=>download('Do_Not_Contact_'+date()+'.json',JSON.stringify(suppression(),null,2),'application/json');
 function validate(){
  const l=db.leads.find(x=>x.id===activeId);
@@ -174,7 +174,7 @@ function validate(){
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)){alert('Enter a valid, verified business email address first.');return null}
  if(db.leads.some(x=>x.id!==l.id&&norm(x.email)===norm(to))){alert('This email address already belongs to another business record.');return null}
  if(suppressed(l)||['not_interested','confirmed'].includes(l.status)){alert('This business is not eligible for outreach.');return null}
- if(!/^ADV:\\s+\\S/i.test($('zSubject').value.trim())){alert('Texas requires ADV: at the beginning of the subject line.');return null}
+ if(!/^ADV:\s+\S/i.test($('zSubject').value.trim())){alert('Texas requires ADV: at the beginning of the subject line.');return null}
  if(!$('zBody').value.includes(mailingAddress().trim())||!$('zBody').toLowerCase().includes('reply remove')){alert('The required mailing address and reply REMOVE instructions must remain in the email body.');return null}
  if(!$('zSubject').value.trim()||!$('zBody').value.trim()){alert('Subject and message are required.');return null}
  if(l.email!==to){l.email=to;save()}
