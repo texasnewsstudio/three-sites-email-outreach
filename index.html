@@ -94,7 +94,7 @@ render=function(){
  if(n&&count){const segment=document.createElement('span');segment.style.width=(100*n/count)+'%';segment.style.background=color;segment.title=label+': '+n;track.append(segment)}
  const entry=document.createElement('span'),dot=document.createElement('i');dot.style.background=color;entry.append(dot,document.createTextNode(label+' · '+n));legend.append(entry)
  });
- $('execTotal').textContent=count+' PROSPECTS · ;
+ $('execTotal').textContent=count+' PROSPECTS · '+(all.filter(x=>x.status==='confirmed').length*10)+' USD/MONTH CONFIRMED';
  if(special){
  const now=date();
  const filtered=all.filter(x=>special==='ready'?x.status==='not_sent'&&!!x.email:(x.status==='follow_up'||x.status==='interested')&&x.followDate&&x.followDate<=now);
