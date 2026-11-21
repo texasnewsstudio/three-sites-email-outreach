@@ -94,7 +94,33 @@ render=function(){
  if(n&&count){const segment=document.createElement('span');segment.style.width=(100*n/count)+'%';segment.style.background=color;segment.title=label+': '+n;track.append(segment)}
  const entry=document.createElement('span'),dot=document.createElement('i');dot.style.background=color;entry.append(dot,document.createTextNode(label+' · '+n));legend.append(entry)
  });
- $('execTotal').textContent=count+' PROSPECTS · +(all.filter(x=>x.status==='confirmed').length*10)+'/MONTH CONFIRMED';
+ $('execTotal').textContent=count+' PROSPECTS · ;
+ if(special){
+ const now=date();
+ const filtered=all.filter(x=>special==='ready'?x.status==='not_sent'&&!!x.email:(x.status==='follow_up'||x.status==='interested')&&x.followDate&&x.followDate<=now);
+ const visible=new Set(filtered.map(x=>x.id));
+ $('leads').querySelectorAll('article.lead').forEach(el=>{const id=Number(el.querySelector('[data-expand]')?.dataset.expand);el.style.display=visible.has(id)?'':'none'});
+ $('count').textContent=(special==='ready'?'Ready to email: ':'Follow-ups due: ')+filtered.length+' businesses';
+ }
+};
+$('execAddToggle').onclick=()=>{$('execAddForm').classList.toggle('open');if($('execAddForm').classList.contains('open'))$('execName').focus()};
+$('execCancel').onclick=()=>{$('execAddForm').reset();$('execAddForm').classList.remove('open')};
+$('execAddForm').onsubmit=e=>{
+ e.preventDefault();const name=$('execName').value.trim(),email=$('execEmail').value.trim();
+ if(!name)return;
+ if(email&&db.leads.some(x=>norm(x.email)===norm(email))){alert('That email is already on the list.');return}
+ db.leads.push({id:db.nextId++,site,business:name,email,city:$('execCity').value.trim(),category:$('execCategory').value.trim(),detail:'',source:'',status:'not_sent',sentDate:'',followDate:'',notes:''});
+ if(save()){$('execAddForm').reset();$('execAddForm').classList.remove('open');special='';$('filter').value='all';$('search').value='';render();notify('Business added to '+SITES[site].name+'. Saved in this browser.')}
+};
+$('execFollow').onclick=()=>{special='due';$('filter').value='all';$('search').value='';render()};
+$('execReady').onclick=()=>{special='ready';$('filter').value='all';$('search').value='';render()};
+$('execAll').onclick=()=>{special='';$('filter').value='all';$('search').value='';render()};
+$('tabs').addEventListener('click',()=>{special='';});
+$('filter').addEventListener('change',()=>{special='';render()});
+$('search').addEventListener('input',()=>{special='';render()});
+render();
+})();
+</script></body></html>+(all.filter(x=>x.status==='confirmed').length*10)+'/MONTH CONFIRMED';
  if(special){
  const now=date();
  const filtered=all.filter(x=>special==='ready'?x.status==='not_sent'&&!!x.email:(x.status==='follow_up'||x.status==='interested')&&x.followDate&&x.followDate<=now);
