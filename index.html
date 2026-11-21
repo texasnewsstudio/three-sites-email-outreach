@@ -128,7 +128,7 @@ render();
 (function(){
 let activeId=null;
 const today=()=>date();
-const ready=()=>items().filter(x=>x.status==='not_sent'&&/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(x.email||''));
+const ready=()=>items().filter(x=>x.status==='not_sent'&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.email||''));
 const due=()=>items().filter(x=>['follow_up','interested'].includes(x.status)&&x.followDate&&x.followDate<=today());
 const sentToday=()=>items().filter(x=>x.status==='sent'&&x.sentDate===today()).length;
 function syncDesk(){
@@ -154,7 +154,7 @@ function validate(){
  const l=db.leads.find(x=>x.id===activeId);
  if(!l||l.site!==site)return null;
  const to=$('zTo').value.trim();
- if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(to)){alert('Enter a valid, verified business email address first.');return null}
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)){alert('Enter a valid, verified business email address first.');return null}
  if(db.leads.some(x=>x.id!==l.id&&norm(x.email)===norm(to))){alert('This email address already belongs to another business record.');return null}
  if(['do_not_contact','not_interested','confirmed'].includes(l.status)){alert('This business is not eligible for outreach.');return null}
  if(!$('zSubject').value.trim()||!$('zBody').value.trim()){alert('Subject and message are required.');return null}
